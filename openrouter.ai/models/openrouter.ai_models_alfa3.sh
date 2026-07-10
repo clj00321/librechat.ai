@@ -19,6 +19,16 @@ SCRIPT_BASENAME=$(basename "$SCRIPT_PATH" .sh)
 OUTPUT_JSON="$SCRIPT_DIR/${SCRIPT_BASENAME}.json"
 OUTPUT_CSV="$SCRIPT_DIR/${SCRIPT_BASENAME}.csv"
 API_URL="https://openrouter.ai/api/v1/models?output_modalities=all"
+RSS_URL="https://openrouter.ai/api/v1/models?use_rss=true"
+RSS_OUTPUT="$SCRIPT_DIR/${SCRIPT_BASENAME}.rss"
+
+# Hent RSS feed
+if [[ -n "$API_KEY" ]]; then
+  curl -sf -H "Authorization: Bearer $API_KEY" "$RSS_URL" > "$RSS_OUTPUT"
+else
+  curl -sf "$RSS_URL" > "$RSS_OUTPUT"
+fi
+echo "RSS eksporteret til: $RSS_OUTPUT"
 # ------------------------------------------------------------
 # OpenRouter.ai Fetching all models
 # ------------------------------------------------------------
@@ -83,6 +93,7 @@ COUNT=$(tail -n +2 "$OUTPUT_CSV" | wc -l)
 echo "Done! $COUNT modeller eksporteret til:"
 echo "  CSV  -> $OUTPUT_CSV"
 echo "  JSON -> $OUTPUT_JSON"
+echo "  RSS  -> $RSS_OUTPUT"
 
 # ------------------------------------------------------------
 # README.md — genereres dynamisk fra $JSON (samme data som CSV/JSON export)
@@ -124,6 +135,7 @@ Automatiseret export af samtlige tilgængelige AI-modeller fra [OpenRouter.ai](h
 | \`${SCRIPT_BASENAME}.sh\` | Bash-script der henter, parser og eksporterer modeldata |
 | \`${SCRIPT_BASENAME}.json\` | Rå JSON-output (fuld struktur, pretty-printed via \`jq\`) |
 | \`${SCRIPT_BASENAME}.csv\` | Flad CSV-export, 32 kolonner, en række pr. model |
+| \`${SCRIPT_BASENAME}.rss\` | RSS-feed med nye modeller (seneste snapshot) |
 
 ---
 
